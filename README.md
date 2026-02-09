@@ -1,62 +1,42 @@
- ██████╗ ██████╗      ███████╗ ██████╗ █████╗ ███╗   ██╗███╗   ██╗███████╗██████╗ 
-██╔═══██╗██╔══██╗     ██╔════╝██╔════╝██╔══██╗████╗  ██║████╗  ██║██╔════╝██╔══██╗
-██║   ██║██████╔╝     ███████╗██║     ███████║██╔██╗ ██║██╔██╗ ██║█████╗  ██████╔╝
-██║   ██║██╔══██╗     ╚════██║██║     ██╔══██║██║╚██╗██║██║╚██╗██║██╔══╝  ██╔══██╗
-╚██████╔╝██║  ██║     ███████║╚██████╗██║  ██║██║ ╚████║██║ ╚████║███████╗██║  ██║
- ╚═════╝ ╚═╝  ╚═╝     ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&size=28&duration=3000&pause=500&color=2563EB&center=true&vCenter=true&width=700&lines=QR_SCANNER+by+PI;Modern+QR+Scanner+Desktop+App;Python+%7C+PyQt6+%7C+OpenCV" />
+</p>
 
-                         QR_SCANNER BY PI
-================================================================================
+---
 
-🚀 ABOUT
---------------------------------------------------------------------------------
-A MODERN, UI-FRIENDLY QR SCANNER DESKTOP APPLICATION BUILT USING
-PYTHON & PYQT6. DESIGNED FOR REAL-WORLD USAGE AND PORTFOLIO SHOWCASE.
+## 🚀 QR_SCANNER by PI
 
-================================================================================
-✨ FEATURES
---------------------------------------------------------------------------------
-📷 CAMERA-BASED QR SCANNING  
-🖼️ IMAGE UPLOAD QR SCANNING  
-🖱️ DRAG & DROP QR IMAGE SUPPORT  
-🪟 IN-APP RESULT PANEL (NO POPUPS)  
-🌐 OPEN SCANNED URLS IN BROWSER  
-📋 COPY SCANNED CONTENT  
-🎨 CLEAN, LIGHT, GLASS-STYLE UI  
+A modern, UI-friendly **QR Scanner desktop application** built with **Python & PyQt6**, designed for real-world use and portfolio showcase.
 
-================================================================================
-🛠️ TECH STACK
---------------------------------------------------------------------------------
-PYTHON  
-PYQT6  
-OPENCV  
-PYZBAR  
-PILLOW  
-PYPERCLIP  
+---
 
-================================================================================
-📂 PROJECT STRUCTURE
---------------------------------------------------------------------------------
-QR-SCANNER/
-├── main.py        # APPLICATION ENTRY POINT
-├── ui.py          # UI LAYOUT & INTERACTIONS
-├── scanner.py     # CAMERA & QR SCANNING LOGIC
-├── utils.py       # HELPER FUNCTIONS
-└── history/
-    └── scans.txt  # STORED SCAN HISTORY
+## ✨ Features
 
-================================================================================
-▶️ HOW TO RUN
---------------------------------------------------------------------------------
+- 📷 Camera-based QR scanning  
+- 🖼️ Image upload QR scanning  
+- 🖱️ Drag & Drop QR image support  
+- 🪟 In-app result panel (no popups)  
+- 🌐 Open scanned URLs in browser  
+- 📋 Copy scanned content  
+- 🎨 Clean, light, glass-style UI  
+
+---
+
+## 🛠️ Tech Stack
+
+```bash
+Python
+PyQt6
+OpenCV
+pyzbar
+Pillow
+pyperclip
+```
+##▶️ Run the App
+```bash
 python -m venv venv
 venv\Scripts\activate
 pip install pyqt6 opencv-python pyzbar pillow pyperclip
 python main.py
-
-================================================================================
-👨‍💻 AUTHOR
---------------------------------------------------------------------------------
-BUILT BY PIYUSH LADUKAR 
-
-================================================================================
-⭐ STAR THIS REPOSITORY IF YOU LIKE IT!
+```
+##👨‍💻 Built by Piyush Ladukar
