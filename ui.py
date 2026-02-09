@@ -1,131 +1,214 @@
-import tkinter as tk
-from tkinter import filedialog, messagebox
-from tkinterdnd2 import DND_FILES, TkinterDnD
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.animation import FuncAnimation
+from PyQt6.QtWidgets import (
+    QWidget, QLabel, QPushButton, QFileDialog,
+    QVBoxLayout, QHBoxLayout, QTextEdit
+)
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QPixmap, QImage
 import cv2
-from scanner import CameraScanner
-from utils import handle_result
-from PIL import Image
+import pyperclip
+from scanner import QRScanner
+from utils import save_history, open_browser
 from pyzbar.pyzbar import decode
-import os
+from PIL import Image
 
-class QRScannerUI:
+
+class QRScannerApp(QWidget):
     def __init__(self):
-        self.root = TkinterDnD.Tk()
-        self.root.title("QR Scanner Pro")
-        self.root.geometry("1000x650")
-        self.root.configure(bg="#0b1220")
+        super().__init__()
 
-        self.camera = CameraScanner()
+        self.setWindowTitle("QR Scan By Piyush Ladukar")
+        self.setGeometry(200, 80, 1100, 800)
+        self.setAcceptDrops(True)
+        self.setStyleSheet("background:#f8fafc;")
 
-        self.build_header()
-        self.build_canvas()
-        self.build_controls()
+        self.scanner = QRScanner()
+        self.timer = QTimer()
+        self.scan_line_y = 0
+        self.scan_dir = 5
 
-        # CAMERA AUTO START
-        self.anim = FuncAnimation(
-            self.fig,
-            self.update_frame,
-            interval=30,
-            cache_frame_data=False
-        )
+        self.build_ui()
 
-        # Drag & Drop
-        self.root.drop_target_register(DND_FILES)
-        self.root.dnd_bind("<<Drop>>", self.on_drop)
+    # ---------------- UI ----------------
+    def build_ui(self):
+        main = QVBoxLayout(self)
+        main.setSpacing(18)
 
-    # ---------- UI SECTIONS ----------
+        # 🧊 DROP ZONE
+        self.drop_zone = QLabel("Drag & Drop QR Image Here")
+        self.drop_zone.setFixedHeight(200)
+        self.drop_zone.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.drop_zone.setStyleSheet("""
+            QLabel {
+                background: rgba(255,255,255,0.9);
+                border: 2px dashed #2563eb;
+                border-radius: 20px;
+                color: #2563eb;
+                font-size: 22px;
+                font-weight: 600;
+            }
+        """)
+        main.addWidget(self.drop_zone)
 
-    def build_header(self):
-        header = tk.Label(
-            self.root,
-            text="🔍 QR Scanner Pro",
-            font=("Segoe UI", 26, "bold"),
-            fg="white",
-            bg="#0b1220"
-        )
-        header.pack(pady=15)
+        # 🎥 CAMERA PANEL
+        self.video = QLabel("Camera Preview")
+        self.video.setMinimumHeight(320)
+        self.video.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.video.setStyleSheet("""
+            QLabel {
+                background: white;
+                border-radius: 18px;
+                border: 1px solid #e2e8f0;
+                color:#64748b;
+                font-size:18px;
+            }
+        """)
+        main.addWidget(self.video)
 
-    def build_canvas(self):
-        self.fig, self.ax = plt.subplots()
-        self.fig.patch.set_facecolor("#0b1220")
-        self.ax.axis("off")
+        # 🔘 BUTTONS
+        btns = QHBoxLayout()
 
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
-        self.canvas.get_tk_widget().pack(expand=True, fill=tk.BOTH)
+        cam_btn = QPushButton("📷 Open Camera")
+        cam_btn.clicked.connect(self.start_camera)
 
-    def build_controls(self):
-        bar = tk.Frame(self.root, bg="#0b1220")
-        bar.pack(pady=15)
+        upload_btn = QPushButton("📁 Upload Image")
+        upload_btn.clicked.connect(self.upload_image)
 
-        tk.Button(
-            bar, text="📁 Upload Image",
-            font=("Segoe UI", 13, "bold"),
-            bg="#2563eb", fg="white",
-            padx=20, pady=10,
-            command=self.upload_image
-        ).pack(side=tk.LEFT, padx=15)
+        for b in (cam_btn, upload_btn):
+            b.setStyleSheet(self.btn_style())
+            btns.addWidget(b)
 
-        tk.Button(
-            bar, text="📜 View History",
-            font=("Segoe UI", 13, "bold"),
-            bg="#16a34a", fg="white",
-            padx=20, pady=10,
-            command=self.show_history
-        ).pack(side=tk.LEFT, padx=15)
+        main.addLayout(btns)
 
-        hint = tk.Label(
-            self.root,
-            text="📌 Tip: Drag & Drop an image anywhere to scan",
-            fg="#94a3b8",
-            bg="#0b1220",
-            font=("Segoe UI", 11)
-        )
-        hint.pack(pady=5)
+        # 🟦 RESULT PANEL
+        self.result_box = QTextEdit()
+        self.result_box.setReadOnly(True)
+        self.result_box.setFixedHeight(140)
+        self.result_box.setPlaceholderText("Scanned result will appear here...")
+        self.result_box.setStyleSheet("""
+            QTextEdit {
+                background: white;
+                border-radius: 16px;
+                border: 1px solid #e2e8f0;
+                padding: 14px;
+                font-size: 15px;
+            }
+        """)
+        main.addWidget(self.result_box)
 
-    # ---------- LOGIC ----------
+        # RESULT ACTION BUTTONS
+        actions = QHBoxLayout()
 
-    def update_frame(self, i):
-        frame, data = self.camera.get_frame()
+        open_btn = QPushButton("🌐 Open Browser")
+        open_btn.clicked.connect(self.open_link)
+
+        copy_btn = QPushButton("📋 Copy")
+        copy_btn.clicked.connect(self.copy_text)
+
+        clear_btn = QPushButton("✖ Clear")
+        clear_btn.clicked.connect(self.clear_result)
+
+        for b in (open_btn, copy_btn, clear_btn):
+            b.setStyleSheet(self.btn_style(light=True))
+            actions.addWidget(b)
+
+        main.addLayout(actions)
+
+        # 👣 FOOTER
+        footer = QLabel("Built by Piyush Ladukar")
+        footer.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        footer.setStyleSheet("color:#64748b; font-size:13px;")
+        main.addWidget(footer)
+
+    def btn_style(self, light=False):
+        if light:
+            return """
+            QPushButton {
+                background: #e2e8f0;
+                color: #0f172a;
+                font-size: 14px;
+                padding: 10px 22px;
+                border-radius: 12px;
+            }
+            QPushButton:hover {
+                background: #cbd5f5;
+            }
+            """
+        return """
+        QPushButton {
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            padding: 14px 34px;
+            border-radius: 14px;
+        }
+        QPushButton:hover {
+            background: #1d4ed8;
+        }
+        """
+
+    # ---------------- CAMERA ----------------
+    def start_camera(self):
+        self.scanner.start_camera()
+        self.timer.timeout.connect(self.update_frame)
+        self.timer.start(30)
+
+    def update_frame(self):
+        frame, data = self.scanner.read_frame()
         if frame is None:
             return
 
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        self.ax.imshow(frame)
-        self.ax.axis("off")
+        h, w, _ = frame.shape
+        self.scan_line_y += self.scan_dir
+        if self.scan_line_y > h or self.scan_line_y < 0:
+            self.scan_dir *= -1
+
+        cv2.line(frame, (0, self.scan_line_y), (w, self.scan_line_y),
+                 (37, 99, 235), 2)
+
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        img = QImage(rgb.data, w, h, 3*w, QImage.Format.Format_RGB888)
+        self.video.setPixmap(QPixmap.fromImage(img))
 
         if data:
-            handle_result(data)
+            self.timer.stop()
+            self.scanner.stop_camera()
+            self.display_result(data)
 
+    # ---------------- IMAGE ----------------
     def upload_image(self):
-        path = filedialog.askopenfilename(
-            filetypes=[("Images", "*.png *.jpg *.jpeg")]
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Select Image", "", "Images (*.png *.jpg *.jpeg)"
         )
         if path:
-            self.scan_image(path)
-
-    def on_drop(self, event):
-        path = event.data.strip("{}")
-        if os.path.isfile(path):
             self.scan_image(path)
 
     def scan_image(self, path):
         img = Image.open(path)
         decoded = decode(img)
         if decoded:
-            handle_result(decoded[0].data.decode("utf-8"))
-        else:
-            messagebox.showerror("No QR", "No QR code found in image")
+            self.display_result(decoded[0].data.decode("utf-8"))
 
-    def show_history(self):
-        try:
-            with open("history/scans.txt", "r", encoding="utf-8") as f:
-                data = f.read()
-            messagebox.showinfo("Scan History", data or "No scans yet")
-        except:
-            messagebox.showinfo("Scan History", "No history found")
+    # ---------------- RESULT HANDLING ----------------
+    def display_result(self, data):
+        self.result_box.setText(data)
+        save_history(data)
 
-    def run(self):
-        self.root.mainloop()
+    def open_link(self):
+        text = self.result_box.toPlainText()
+        if text.startswith("http"):
+            open_browser(text)
+
+    def copy_text(self):
+        pyperclip.copy(self.result_box.toPlainText())
+
+    def clear_result(self):
+        self.result_box.clear()
+
+    # ---------------- DRAG & DROP ----------------
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+
+    def dropEvent(self, event):
+        path = event.mimeData().urls()[0].toLocalFile()
+        self.scan_image(path)

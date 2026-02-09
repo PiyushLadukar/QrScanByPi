@@ -1,11 +1,17 @@
 import cv2
 from pyzbar.pyzbar import decode
 
-class CameraScanner:
+class QRScanner:
     def __init__(self):
+        self.cap = None
+
+    def start_camera(self):
         self.cap = cv2.VideoCapture(0)
 
-    def get_frame(self):
+    def read_frame(self):
+        if not self.cap:
+            return None, None
+
         ret, frame = self.cap.read()
         if not ret:
             return None, None
@@ -18,5 +24,7 @@ class CameraScanner:
 
         return frame, data
 
-    def release(self):
-        self.cap.release()
+    def stop_camera(self):
+        if self.cap:
+            self.cap.release()
+            self.cap = None
