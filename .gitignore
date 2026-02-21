@@ -1,0 +1,29 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+env/
+
+# Build / executable files
+build/
+dist/
+*.spec
+
+# VS Code
+.vscode/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Project local data
+history/
+scans.txt
+
+# Environment variables
+.env
