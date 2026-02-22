@@ -4,7 +4,15 @@ from PIL import Image
 import os
 from datetime import datetime
 
-app = Flask(__name__)
+from flask import Flask, send_from_directory
+
+app = Flask(__name__, static_folder="static", static_url_path="/static")
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(app.static_folder, 'favicon.ico')
+
+
 
 def save_history(data):
     os.makedirs("history", exist_ok=True)
@@ -49,3 +57,4 @@ def save_scan():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
+

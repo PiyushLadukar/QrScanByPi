@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="shortcut icon" href="/static/fevicon.ico">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>QRSCAN  By Pi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <!-- jsQR for browser-based QR decoding from webcam -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <style>
@@ -492,7 +494,7 @@ footer{
   <!-- HEADER -->
   <header>
     <div class="logo-wrap">
-      <div class="logo-icon">◈</div>
+      <div class="logo-image">◈</div>
       <div>
         <div class="logo-text">QRSCAN BY PI</div>
         <div class="logo-sub">SECURE DECODING SYSTEM</div>
