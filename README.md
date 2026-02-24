@@ -21,7 +21,7 @@
 
 ---
 
-## ⚡ WHAT IS QR\_SCANNER?
+## ⚡ WHAT IS QR_SCANNER?
 
 > 🔥 **QR\_SCANNER** is a lightning-fast, **web-based** QR decoder powered by **Flask + OpenCV**. No clunky desktop installs — just spin up the server, open your browser, and scan. Point your webcam. Upload an image. Drag-and-drop. Results appear **instantly on the page**. No popups. No cloud. 100% local. Pure speed.
 
