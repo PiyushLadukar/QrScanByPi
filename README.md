@@ -192,8 +192,6 @@ INCOMING ━━━━━━━━━━━━━━━━━━━━━━━�
 
 <br/><br/>
 
-<img src="https://streak-stats.demolab.com?user=piyushladukar&theme=neon-dark&hide_border=true&background=0d1117&ring=00fff7&fire=ff00c8&currStreakLabel=ffe500&sideLabels=00fff7" width="55%"/>
-
 <br/><br/>
 
 
